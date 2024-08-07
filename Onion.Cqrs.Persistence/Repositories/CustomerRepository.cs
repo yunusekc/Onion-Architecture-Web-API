@@ -25,12 +25,9 @@ namespace Onion.Cqrs.Persistence.Repositories
 
         public async Task<IEnumerable<CustomerViewDTO>> GetAllCustomersAsync()
         {
-            //var query = $"SELECT * FROM {tableName}";
             using (var conn = dapperContext.GetConnection())
             {
                 conn.Open();
-                //var rt = await conn.QueryAsync<T>(query);
-                //return rt.FirstOrDefault();
                 var rt = await conn.QueryAsync<CustomerViewDTO>("SP_GET_CUSTOMERS", commandType: System.Data.CommandType.StoredProcedure);
                 return rt;
             }

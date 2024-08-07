@@ -1,14 +1,10 @@
-﻿using MediatR;
+﻿using Dapper;
+using MediatR;
 using Newtonsoft.Json;
 using Onion.Cqrs.Application.Interface;
 using Onion.Cqrs.Application.SecurityExtensions;
 using Onion.Cqrs.Application.Wrapper;
 using Onion.Cqrs.Domain;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Onion.Cqrs.Application.Features.Commands.UpdateCustomer
 {
@@ -40,7 +36,16 @@ namespace Onion.Cqrs.Application.Features.Commands.UpdateCustomer
                     Name = request.Name,
                     Surname = request.Surname
                 };
-                var rt = await customerRepository.Update(entity);
+
+                #region  Adding Related Parameters
+                var p = new DynamicParameters();
+                p.Add("@ID", entity.Id);
+                p.Add("@CUSTOMERKEY", entity.CustomerKey);
+                p.Add("@NAME", entity.Name);
+                p.Add("@SURNAME", entity.Surname);
+
+                #endregion
+                var rt = await customerRepository.Update(entity, "SP_UPDATE_CUSTOMER", p);
                 return new ServiceResponse<CustomerEntity>(rt)
                 {
                     IsSuccess = true,

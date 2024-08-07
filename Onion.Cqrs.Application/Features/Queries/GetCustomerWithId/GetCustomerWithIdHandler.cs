@@ -1,14 +1,8 @@
-﻿using MediatR;
+﻿using Dapper;
+using MediatR;
 using Onion.Cqrs.Application.DTO;
 using Onion.Cqrs.Application.Interface;
-using Onion.Cqrs.Application.SecurityExtensions;
 using Onion.Cqrs.Application.Wrapper;
-using Onion.Cqrs.Domain;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Onion.Cqrs.Application.Features.Queries.GetCustomerWithId
 {
@@ -22,7 +16,12 @@ namespace Onion.Cqrs.Application.Features.Queries.GetCustomerWithId
         }
         public async Task<ServiceResponse<CustomerViewDTO>> Handle(GetCustomerWithId request, CancellationToken cancellationToken)
         {
-            var rt = await customerRepository.GetByIdAsync(request.Id);
+            #region Adding Related Parameters
+            var p = new DynamicParameters();
+            p.Add("@ID", request.Id);
+            #endregion
+
+            var rt = await customerRepository.GetByIdAsync(request.Id, "SP_GET_CUSTUMER_WITH_ID", p);
             var customerViewDTOs = new CustomerViewDTO
             {
                 Id = rt.Id,

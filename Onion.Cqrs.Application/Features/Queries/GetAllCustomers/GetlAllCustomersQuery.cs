@@ -1,25 +1,21 @@
 ﻿using MediatR;
-using Newtonsoft.Json;
 using Onion.Cqrs.Application.DTO;
 using Onion.Cqrs.Application.Interface;
-using Onion.Cqrs.Application.SecurityExtensions;
-using Onion.Cqrs.Domain;
-using System.Text.Json.Nodes;
 
 namespace Onion.Cqrs.Application.Features.Queries.GetAllCustomers
 {
-    public class GetlAllCustomersQuery : IRequest<List<CustomerViewDTO>>
+    public class GetlAllCustomersQuery : IRequest<IEnumerable<CustomerViewDTO>>
     {
-        public class GetAllCustomersQueryHandler : IRequestHandler<GetlAllCustomersQuery, List<CustomerViewDTO>>
+        public class GetAllCustomersQueryHandler : IRequestHandler<GetlAllCustomersQuery, IEnumerable<CustomerViewDTO>>
         {
             private ICustomerRepository _customerRepository;
             public GetAllCustomersQueryHandler(ICustomerRepository customerInterface)
             {
                 _customerRepository = customerInterface;
             }
-            public async Task<List<CustomerViewDTO>> Handle(GetlAllCustomersQuery request, CancellationToken cancellationToken)
+            public async Task<IEnumerable<CustomerViewDTO>> Handle(GetlAllCustomersQuery request, CancellationToken cancellationToken)
             {
-                var customers = await _customerRepository.GetAllAsync();
+                var customers = await _customerRepository.GetAllAsync("SP_GET_CUSTOMERS");
 
                 var customerViewDTOs = customers.Select(customer => new CustomerViewDTO
                 {
@@ -31,16 +27,9 @@ namespace Onion.Cqrs.Application.Features.Queries.GetAllCustomers
                         APIKey = customer.APIKey,
                         APIPassword = customer.APIPassword
                     }
-                }).ToList();
+                });
 
                 return customerViewDTOs;
-
-                //return customers.Select(c => new CustomerViewDTO
-                //{
-                //    Id = c.Id,
-                //    Name = c.Name,
-                //    Surname = c.Surname
-                //}).ToList();
             }
         }
     }

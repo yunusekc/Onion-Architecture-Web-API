@@ -18,7 +18,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Onion.Cqrs.Application\Onion.Cqrs.Application.csproj" />
-    <ProjectReference Include="..\Onion.Cqrs.Domain\Onion.Cqrs.Domain.csproj" />
   </ItemGroup>
 
 </Project>

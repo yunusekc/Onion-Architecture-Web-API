@@ -1,11 +1,7 @@
-﻿using MediatR;
+﻿using Dapper;
+using MediatR;
 using Onion.Cqrs.Application.Interface;
 using Onion.Cqrs.Application.Wrapper;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Onion.Cqrs.Application.Features.Commands.DeleteCustomer
 {
@@ -21,7 +17,12 @@ namespace Onion.Cqrs.Application.Features.Commands.DeleteCustomer
         {
             try
             {
-                var rt = await customerRepository.Delete(request.Id);
+                #region Adding Related Parameters
+                var p = new DynamicParameters();
+                p.Add("@ID", request.Id);
+                #endregion
+
+                var rt = await customerRepository.Delete(request.Id, "SP_DELETE_CUSTOMER", p);
                 return new ServiceResponse<Guid>(rt.Id) { IsSuccess = true, Message = "success", Value = request.Id};
             }
             catch (Exception ex)

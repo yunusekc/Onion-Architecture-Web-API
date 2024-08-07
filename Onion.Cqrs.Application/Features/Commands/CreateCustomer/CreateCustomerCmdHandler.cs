@@ -1,16 +1,10 @@
-﻿using AutoMapper.Execution;
+﻿using Dapper;
 using MediatR;
 using Newtonsoft.Json;
-using Onion.Cqrs.Application.DTO;
 using Onion.Cqrs.Application.Interface;
 using Onion.Cqrs.Application.SecurityExtensions;
 using Onion.Cqrs.Application.Wrapper;
 using Onion.Cqrs.Domain;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Onion.Cqrs.Application.Features.Commands.CreateProduct
 {
@@ -43,7 +37,17 @@ namespace Onion.Cqrs.Application.Features.Commands.CreateProduct
                     Name = request.Name,
                     Surname = request.Surname
                 };
-                var rt = await customerRepository.AddAsync(entity);
+
+                #region  Adding Related Parameters
+                var p = new DynamicParameters();
+                p.Add("@ID", entity.Id);
+                p.Add("@CUSTOMERKEY", entity.CustomerKey);
+                p.Add("@NAME", entity.Name);
+                p.Add("@SURNAME", entity.Surname);
+
+                #endregion
+
+                var rt = await customerRepository.AddAsync(entity, "SP_ADD_CUSTOMER", p);
                 return new ServiceResponse<CustomerEntity>(rt)
                 {
                     IsSuccess = true,
